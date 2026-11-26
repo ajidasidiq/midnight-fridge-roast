@@ -17,5 +17,20 @@ const ROAST = readFileSync(
   'utf8',
 );
 
+// Gate self-check, mirroring the sealed scorer: one line, 1-159
+// characters, not only white space, no control characters.
+if (ROAST.length < 1 || ROAST.length > 159) {
+  throw new Error(`roast must be 1-159 characters, got ${ROAST.length}`);
+}
+if (!ROAST.trim()) throw new Error('roast must not be only white space');
+if (ROAST.includes('\n') || ROAST.includes('\r')) {
+  throw new Error('roast must be a single line');
+}
+for (const ch of ROAST) {
+  if (ch.charCodeAt(0) < 0x20 || ch.charCodeAt(0) === 0x7f) {
+    throw new Error('roast must not contain control characters');
+  }
+}
+
 mkdirSync(OUTPUT_DIR, { recursive: true });
 writeFileSync(join(OUTPUT_DIR, 'entry.txt'), ROAST);
